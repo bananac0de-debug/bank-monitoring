@@ -1,0 +1,180 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0b1220">
+  <title>Transaction Monitor | Northstar</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js" defer></script>
+  <script src="{{ url_for('static', filename='script.js') }}" defer></script>
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar">
+      <a class="brand" href="#overview" aria-label="Northstar overview">
+        <span class="brand-mark">N</span>
+        <span><strong>northstar</strong><small>MONITORING SUITE</small></span>
+      </a>
+      <div class="nav-label">WORKSPACE</div>
+      <nav class="side-nav" aria-label="Main navigation">
+        <a class="nav-item active" href="#overview"><span class="nav-icon">◫</span>Overview</a>
+        <a class="nav-item" href="#transactions"><span class="nav-icon">⇄</span>Transactions</a>
+        <a class="nav-item" href="#alerts"><span class="nav-icon">◇</span>Alerts <span class="nav-count" id="nav-alert-count">—</span></a>
+        <a class="nav-item" href="#algorithms"><span class="nav-icon">⌘</span>DSA lab</a>
+      </nav>
+      <div class="sidebar-bottom">
+        <div class="demo-card">
+          <span class="demo-dot"></span>
+          <div><strong>Academic demo</strong><small>Synthetic data only</small></div>
+        </div>
+        <p class="sidebar-note">Alerts are patterns for review, not confirmed fraud.</p>
+      </div>
+    </aside>
+
+    <main class="main-content">
+      <header class="topbar">
+        <div class="mobile-brand"><span class="brand-mark">N</span><strong>northstar</strong></div>
+        <div class="breadcrumb">Monitoring <span>/</span> <strong>Overview</strong></div>
+        <div class="top-actions">
+          <label class="global-search">
+            <span aria-hidden="true">⌕</span>
+            <input id="global-search" type="search" placeholder="Search transaction or account…" aria-label="Search transactions">
+            <kbd>↵</kbd>
+          </label>
+          <div class="system-status"><span class="status-dot"></span><span>System operational</span></div>
+          <button class="avatar" type="button" id="about-button" aria-label="About this demonstration">DS</button>
+        </div>
+      </header>
+
+      <div class="page-wrap">
+        <section class="page-heading" id="overview">
+          <div>
+            <div class="eyebrow">SATURDAY, OCTOBER 11, 2026 <span class="live-dot"></span> LIVE DEMO</div>
+            <h1>Transaction overview</h1>
+            <p class="subheading">Monitor activity, surface unusual patterns, and review flagged transfers.</p>
+          </div>
+          <button class="button button-secondary" type="button" id="refresh-button"><span class="refresh-icon">↻</span> Refresh data</button>
+        </section>
+
+        <div class="error-banner" id="error-banner" role="alert" hidden></div>
+
+        <section class="metric-grid" aria-label="Transaction summary">
+          <article class="metric-card">
+            <div class="metric-top"><span>Total transactions</span><span class="metric-icon icon-blue">⇄</span></div>
+            <strong class="metric-value" id="stat-total">—</strong>
+            <div class="metric-foot"><span class="metric-caption">Across all monitored activity</span></div>
+          </article>
+          <article class="metric-card">
+            <div class="metric-top"><span>Transaction value</span><span class="metric-icon icon-green">$</span></div>
+            <strong class="metric-value" id="stat-value">—</strong>
+            <div class="metric-foot"><span class="metric-caption">Combined transaction volume</span></div>
+          </article>
+          <article class="metric-card">
+            <div class="metric-top"><span>Flagged transactions</span><span class="metric-icon icon-amber">◇</span></div>
+            <strong class="metric-value" id="stat-flagged">—</strong>
+            <div class="metric-foot"><span class="metric-caption">Patterns requiring review</span></div>
+          </article>
+          <article class="metric-card">
+            <div class="metric-top"><span>Failed transactions</span><span class="metric-icon icon-red">!</span></div>
+            <strong class="metric-value" id="stat-failed">—</strong>
+            <div class="metric-foot"><span class="metric-caption">Failed or declined attempts</span></div>
+          </article>
+        </section>
+
+        <section class="chart-grid" aria-label="Transaction charts">
+          <article class="panel chart-panel">
+            <div class="panel-heading">
+              <div><h2>Transaction volume</h2><p>Activity by day</p></div>
+              <span class="chart-period">OCT 10 — OCT 11</span>
+            </div>
+            <div class="chart-area"><canvas id="volume-chart" aria-label="Transaction volume by day"></canvas></div>
+          </article>
+          <article class="panel chart-panel">
+            <div class="panel-heading">
+              <div><h2>Transaction amount</h2><p>Daily value in USD</p></div>
+              <span class="chart-period">USD</span>
+            </div>
+            <div class="chart-area"><canvas id="amount-chart" aria-label="Transaction amount by day"></canvas></div>
+          </article>
+        </section>
+
+        <section class="panel transactions-panel" id="transactions">
+          <div class="section-header">
+            <div><div class="section-title-row"><h2>Transaction activity</h2><span class="result-count" id="result-count">Loading…</span></div>
+              <p>Search, filter, and inspect transaction records</p></div>
+            <button class="button button-quiet" type="button" id="reset-filters">Reset filters</button>
+          </div>
+          <form id="filter-form" class="filter-bar">
+            <label class="filter-control search-filter"><span>Search</span><input type="search" id="table-search" placeholder="ID or account"></label>
+            <label class="filter-control"><span>Status</span>
+              <select id="status-filter">
+                <option value="">All statuses</option><option value="completed">Completed</option><option value="pending">Pending</option><option value="failed">Failed</option><option value="declined">Declined</option>
+              </select>
+            </label>
+            <label class="filter-control"><span>Account ID</span><input type="text" id="account-filter" placeholder="e.g. AC-1001" maxlength="24"></label>
+            <label class="filter-control"><span>From date</span><input type="date" id="date-from"></label>
+            <label class="filter-control"><span>To date</span><input type="date" id="date-to"></label>
+            <label class="filter-control amount-filter"><span>Min amount</span><input type="number" id="min-amount" min="0" step="0.01" placeholder="$0"></label>
+            <label class="filter-control amount-filter"><span>Max amount</span><input type="number" id="max-amount" min="0" step="0.01" placeholder="No limit"></label>
+            <button class="button button-primary apply-button" type="submit">Apply</button>
+          </form>
+          <div class="table-wrap">
+            <table>
+              <thead><tr>
+                <th><button class="sort-button" data-sort="transaction_id">Transaction <span>↕</span></button></th>
+                <th>Sender / recipient</th>
+                <th><button class="sort-button" data-sort="amount">Amount <span>↕</span></button></th>
+                <th>Type</th><th><button class="sort-button" data-sort="timestamp">Date &amp; time <span>↕</span></button></th><th>Status</th>
+              </tr></thead>
+              <tbody id="transaction-rows"><tr><td colspan="6"><div class="loading-state"><span class="spinner"></span> Loading transactions…</div></td></tr></tbody>
+            </table>
+          </div>
+          <div class="table-footer"><span id="table-footer-text">Showing transactions</span><span>Click a row to inspect details</span></div>
+        </section>
+
+        <section class="lower-grid">
+          <article class="panel alerts-panel" id="alerts">
+            <div class="section-header compact-header">
+              <div><div class="section-title-row"><h2>Review queue</h2><span class="live-pill">DEMO</span></div>
+                <p>Patterns that may warrant investigation</p></div>
+              <span class="alert-count" id="alert-count">—</span>
+            </div>
+            <div class="alert-list" id="alert-list"><div class="loading-state"><span class="spinner"></span> Loading alerts…</div></div>
+            <div class="queue-footnote" id="queue-engine">Queue is loading…</div>
+          </article>
+          <article class="panel algorithm-panel" id="algorithms">
+            <div class="section-header compact-header">
+              <div><div class="section-title-row"><h2>DSA lab</h2><span class="live-pill blue-pill">ALGORITHMS</span></div>
+                <p>Run the implemented search and sort operations</p></div>
+            </div>
+            <div class="algorithm-controls">
+              <label class="filter-control"><span>Search mode</span><select id="algorithm-mode"><option value="linear">Linear search</option><option value="binary">Binary search</option></select></label>
+              <label class="filter-control"><span>Find by</span><select id="algorithm-field"><option value="transaction_id">Transaction ID</option><option value="sender_account_id">Sender account</option></select></label>
+              <label class="filter-control"><span>Value</span><input id="algorithm-query" type="text" placeholder="e.g. 1017"></label>
+              <button class="button button-primary" type="button" id="algorithm-search">Run search</button>
+              <label class="filter-control"><span>Sort records by</span><select id="algorithm-sort-key"><option value="amount">Amount</option><option value="transaction_id">Transaction ID</option></select></label>
+              <select id="algorithm-sort-order" aria-label="Sort direction"><option value="desc">Descending</option><option value="asc">Ascending</option></select>
+              <button class="button button-secondary" type="button" id="algorithm-sort">Run merge sort</button>
+            </div>
+            <div class="algorithm-result" id="algorithm-result" aria-live="polite">Checking C integration…</div>
+            <div class="complexity-note"><strong>Complexity</strong><span>Linear search O(n) · Binary search O(log n) after sorting · Merge sort O(n log n) · Alert queue enqueue/dequeue O(1)</span></div>
+          </article>
+        </section>
+        <footer class="page-footer">Northstar Transaction Monitor <span>•</span> Synthetic academic demonstration only</footer>
+      </div>
+    </main>
+  </div>
+
+  <div class="modal-backdrop" id="detail-backdrop" hidden>
+    <section class="detail-modal" role="dialog" aria-modal="true" aria-labelledby="detail-title">
+      <div class="modal-header"><div><span class="eyebrow">TRANSACTION RECORD</span><h2 id="detail-title">Transaction details</h2></div><button type="button" class="modal-close" id="close-detail" aria-label="Close transaction details">×</button></div>
+      <div id="detail-content"></div>
+    </section>
+  </div>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+</body>
+</html>

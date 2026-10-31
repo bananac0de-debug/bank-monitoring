@@ -1,0 +1,6 @@
+.venv/
+.vscode/
+.tsupgrader/
+frontend/node_modules/
+__pycache__/
+bank-monitoring-final.zip
