@@ -164,7 +164,7 @@ function Shell() {
           <span><strong>Bank Monitor</strong><small>TRANSACTION INTELLIGENCE</small></span>
         </NavLink>
         <p className="nav-label">WORKSPACE</p>
-        <nav className="side-nav" aria-label="Main navigation">
+        <nav className="side-nav" id="main-navigation" aria-label="Main navigation">
           {navItems.map(({ path, label, icon: Icon }) => (
             <NavLink
               key={path}
@@ -187,10 +187,19 @@ function Shell() {
           <p className="sidebar-disclaimer">Synthetic demonstration dataset. Review signals are not confirmed fraud.</p>
         </div>
       </aside>
-      {mobileNav ? <button className="nav-backdrop" aria-label="Close navigation" onClick={() => setMobileNav(false)} /> : null}
+      {mobileNav ? <button className="nav-backdrop" type="button" aria-label="Close navigation" onClick={() => setMobileNav(false)} /> : null}
       <main className="main-content">
         <Header />
-        <button className="mobile-menu icon-button" type="button" aria-label="Open navigation" aria-expanded={mobileNav} onClick={() => setMobileNav(true)}><Menu size={17} /></button>
+        <button
+          className={`mobile-menu icon-button ${mobileNav ? "mobile-menu-open" : ""}`}
+          type="button"
+          aria-label={mobileNav ? "Close navigation" : "Open navigation"}
+          aria-controls="main-navigation"
+          aria-expanded={mobileNav}
+          onClick={() => setMobileNav((open) => !open)}
+        >
+          {mobileNav ? <X size={17} /> : <Menu size={17} />}
+        </button>
         <div className="page-context"><span>WORKSPACE</span><b>/</b>{title}</div>
         <Suspense fallback={<div className="page-wrap"><StateView loading /></div>}>
           <motion.div
